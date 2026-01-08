@@ -13,10 +13,11 @@ connect();
 
 const app = express();
 
-// FORCE RESTART FOR SCHEMA UPDATE - RETRY
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true
+    origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174'].filter(Boolean),
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use((req, res, next) => {
     res.header("Cross-Origin-Embedder-Policy", "credentialless");

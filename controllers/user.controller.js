@@ -20,8 +20,8 @@ export const createUserController = async (req, res) => {
 
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: true, // Always true for SameSite: None 
+            sameSite: 'none',
             maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
 
@@ -64,8 +64,8 @@ export const loginController = async (req, res) => {
 
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: true, 
+            sameSite: 'none',
             maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
 
