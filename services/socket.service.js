@@ -75,7 +75,7 @@ export const registerSocketHandlers = (io, socket) => {
         // Create if not exists (or recreate/respawn)
         if (!terminals[roomId][termId]) {
             createTerminal(termId);
-            console.log(`Created terminal ${termId} for room ${roomId}`);
+            // console.log(`Created terminal ${termId} for room ${roomId}`);
         }
     });
 
@@ -95,7 +95,7 @@ export const registerSocketHandlers = (io, socket) => {
         if (ptyProcess) {
             ptyProcess.kill();
             delete terminals[roomId][termId];
-            console.log(`Killed terminal ${termId} in room ${roomId}`);
+            // console.log(`Killed terminal ${termId} in room ${roomId}`);
         }
     });
 

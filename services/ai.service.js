@@ -65,7 +65,7 @@ async function tryGemini(modelName, prompt, systemInstruction = JSON_SYSTEM_PROM
 // --- HELPER: Groq Generation (Fallback) ---
 async function tryGroq(prompt, systemInstruction = JSON_SYSTEM_PROMPT) {
     try {
-        console.log("🔄 Switching to Groq Fallback...");
+        // console.log("🔄 Switching to Groq Fallback...");
         const completion = await groq.chat.completions.create({
             messages: [
                 { role: "system", content: systemInstruction },
@@ -87,10 +87,10 @@ export const generateResult = async (prompt, systemInstruction = JSON_SYSTEM_PRO
 
     // 1. Try Gemini Models in order
     for (const modelName of GEMINI_MODELS) {
-        console.log(`🤖 Trying Gemini Model: ${modelName}...`);
+        // console.log(`🤖 Trying Gemini Model: ${modelName}...`);
         const result = await tryGemini(modelName, prompt, systemInstruction);
         if (result) {
-            console.log(`✅ Success with ${modelName}`);
+            // console.log(`✅ Success with ${modelName}`);
             return result;
         }
     }

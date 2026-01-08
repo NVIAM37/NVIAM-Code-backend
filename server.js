@@ -76,7 +76,7 @@ import { registerSocketHandlers } from './services/socket.service.js';
 
 
 io.on('connection', socket => {
-    console.log('a user connected');
+    // console.log('a user connected');
 
     socket.roomId = socket.project._id.toString();
 
@@ -102,7 +102,7 @@ io.on('connection', socket => {
         
         // Notify
         socket.emit('room-created', { roomId });
-        console.log(`Room created: ${roomId} by ${socket.user.email}`);
+        // console.log(`Room created: ${roomId} by ${socket.user.email}`);
     });
 
     socket.on('join-room', async ({ roomId }) => {

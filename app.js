@@ -17,8 +17,6 @@ const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:5173', 'http
     .filter(Boolean)
     .map(url => url.replace(/\/$/, ''));
 
-console.log("Allowed Origins:", allowedOrigins);
-
 app.use(cors({
     origin: (origin, callback) => {
         // Allow requests with no origin (like mobile apps or curl requests)
@@ -27,7 +25,6 @@ app.use(cors({
         if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            console.log("❌ CORS Blocked Origin:", origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
