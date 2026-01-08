@@ -12,7 +12,9 @@ function connect() {
             console.log("Connected to MongoDB");
         })
         .catch(err => {
-            console.log(err);
+            console.error("❌ Failed to connect to MongoDB:", err.message);
+            // On a Cloud platform, if DB fails, we should restart/crash to signal health check failure
+            process.exit(1);
         })
 }
 
