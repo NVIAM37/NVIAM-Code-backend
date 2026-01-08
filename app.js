@@ -13,8 +13,12 @@ connect();
 
 const app = express();
 
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174']
+    .filter(Boolean)
+    .map(url => url.replace(/\/$/, '')); // Remove trailing slash
+
 app.use(cors({
-    origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174'].filter(Boolean),
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
