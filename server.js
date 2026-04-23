@@ -4,7 +4,7 @@ import app from './app.js';
 import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
-import connect from './db/db.js';
+import connect, { getDbStatus } from './db/db.js';
 import redisClient from './services/redis.service.js';
 import projectModel from './models/project.model.js';
 import * as projectService from './services/project.service.js';
@@ -42,6 +42,11 @@ app.set('io', io);
 
 io.use(async (socket, next) => {
     try {
+        const dbStatus = getDbStatus();
+        if (!dbStatus.ready) {
+            return next(new Error('Database unavailable'));
+        }
+
         const token = socket.handshake.auth?.token || socket.handshake.headers.authorization?.split(' ')[1];
         const projectId = socket.handshake.query.projectId;
 
@@ -266,8 +271,6 @@ async function startServer() {
         throw new Error('Missing JWT_SECRET environment variable.');
     }
 
-    await connect();
-
     if (typeof redisClient.connect === 'function') {
         try {
             await redisClient.connect();
@@ -279,10 +282,16 @@ async function startServer() {
     server.listen(port, () => {
         console.log(`Server is running on port ${port}`);
     });
+
+    try {
+        await connect();
+    } catch (error) {
+        console.error('Initial MongoDB connection failed. Server will stay up in degraded mode.', error);
+    }
 }
 
 startServer().catch((error) => {
-    console.error('Failed to start server:', error.message);
+    console.error('Failed to start server:', error);
     process.exit(1);
 });
 
