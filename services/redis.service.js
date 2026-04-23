@@ -1,29 +1,48 @@
-import Redis from "ioredis";
+import Redis from 'ioredis';
 
-const redisClient = new Redis({
-  host: process.env.REDIS_HOST || "localhost",
-  port: process.env.REDIS_PORT || 6379,
-  password: process.env.REDIS_PASSWORD || undefined,
-  username: process.env.REDIS_USERNAME || undefined,
-  // Add retry strategy to avoid flooding logs if down
-  retryStrategy: (times) => {
-    // If it fails, wait 5 seconds before retrying, max 20 seconds
-    const delay = Math.min(times * 50, 2000);
-    return delay;
-  },
-  // Don't crash on connection error
-  maxRetriesPerRequest: null,
-  enableOfflineQueue: false, // Fail fast if not connected
-});
+const redisUrl = process.env.REDIS_URI || process.env.REDIS_URL;
+const hasRedisConfig = Boolean(redisUrl || process.env.REDIS_HOST);
 
-// Suppress unhandled error logs
-redisClient.on("error", (err) => {
-  // Just log once or silently fail for development
-  // console.log('Redis Client Error (Optional):', err.message);
-});
+let redisClient;
 
-redisClient.on("connect", () => {
-  console.log("Redis connected");
-});
+if (hasRedisConfig) {
+    redisClient = redisUrl
+        ? new Redis(redisUrl, {
+            retryStrategy: (times) => Math.min(times * 50, 2000),
+            maxRetriesPerRequest: 1,
+            enableOfflineQueue: false,
+            lazyConnect: true
+        })
+        : new Redis({
+            host: process.env.REDIS_HOST,
+            port: Number(process.env.REDIS_PORT || 6379),
+            password: process.env.REDIS_PASSWORD || undefined,
+            username: process.env.REDIS_USERNAME || undefined,
+            retryStrategy: (times) => Math.min(times * 50, 2000),
+            maxRetriesPerRequest: 1,
+            enableOfflineQueue: false,
+            lazyConnect: true
+        });
+
+    redisClient.on('error', (err) => {
+        console.error('Redis connection error:', err.message);
+    });
+
+    redisClient.on('connect', () => {
+        console.log('Redis connected');
+    });
+} else {
+    const noop = async () => null;
+
+    redisClient = {
+        connect: async () => null,
+        get: noop,
+        set: noop,
+        quit: async () => null,
+        status: 'disabled'
+    };
+
+    console.log('Redis not configured. Continuing without Redis.');
+}
 
 export default redisClient;
